@@ -88,3 +88,10 @@ add gem 'pg'
 # username: api_example
 # password: your_password
 
+# Terminal
+# sudo -u postgresql psql
+# create database api_example_<env>
+# create user api_example with encrypted password 'secretpass';
+# grant all privileges on database api_example_development to api_example;
+
+rake db:migrate
