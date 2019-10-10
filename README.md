@@ -77,6 +77,8 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 curl -X PUT ation/json" -H "Content-Type: application/json" -d '{"email": "mario.saraiva@gmail.com"}' "localhost:3000/api/v1/users/2"
 curl -X DELETE "localhost:3000/api/v1/users/1"
 
+### Deployment to HEROKU
+
 # Switch to PG
 remove gem 'sqlite3'
 add gem 'pg'
@@ -95,3 +97,27 @@ add gem 'pg'
 # grant all privileges on database api_example_development to api_example;
 
 rake db:migrate
+
+# Install Heroku CLI
+# https://devcenter.heroku.com/articles/heroku-cli#download-and-install
+# curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+# heroku login
+# heroku create
+# git config --list
+# git push heroku master
+
+# heroko dyno interactive shell session 
+# heroku run bash
+
+# heroku run rake db:migrate
+
+# Not sure about this command
+# heroku ps:scale web=1
+
+# heroku ps
+
+# heroku open (opens your app on the browser)
+# heroku logs
+# heroku logs --tail
+# heroku run rails console
+# heroku run rake etc...
