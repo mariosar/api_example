@@ -77,3 +77,14 @@ curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -
 curl -X PUT ation/json" -H "Content-Type: application/json" -d '{"email": "mario.saraiva@gmail.com"}' "localhost:3000/api/v1/users/2"
 curl -X DELETE "localhost:3000/api/v1/users/1"
 
+# Switch to PG
+remove gem 'sqlite3'
+add gem 'pg'
+# In database.yml -> change:
+# adapter: postgresql
+# host: localhost
+# encoding: unicode
+# database: api_example_<env>
+# username: api_example
+# password: your_password
+
