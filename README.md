@@ -71,4 +71,5 @@ touch config/initializers/rack_attack.rb
 
 rails g model user name email
 rails g serializer user
+rails g scaffold_controller api::v1::users --model-name=user
 
