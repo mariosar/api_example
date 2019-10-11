@@ -121,3 +121,10 @@ rake db:migrate
 # heroku logs --tail
 # heroku run rails console
 # heroku run rake etc...
+
+# Tell Heroku how to start the app
+# echo 'web: bundle exec puma -t 5:5 -p ${PORT:-3000} -e ${RACK_ENV:-development}' >> Procfile
+# Or else it will just run your app is running rails s (but this is not suitable for production)
+# Run heroku local and you will start your web server by executing the command in your Procfile
+
+
