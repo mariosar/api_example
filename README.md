@@ -74,7 +74,7 @@ xhttp.onreadystatechange = function() {
     console.log(this.responseText);
   }
 };
-xhttp.open("GET", "ajax_info.txt", true);
+xhttp.open("GET", "http://localhost:3000/users", true);
 xhttp.send();
 ```
 
