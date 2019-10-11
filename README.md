@@ -62,12 +62,23 @@ config.middleware.insert_before 0, Rack::Cors do
 end
 ```
 
-If your CORS Ajax requests were blocked before, try them now. In any website with jQuery, open up the developer console and try to send a quick request to your API:
+If your CORS Ajax requests were blocked before, try them now. In any website, open up the developer console and try to send a quick request to your API:
 ```
-# $.ajax("http://localhost:3000/users")
+# Using jQuery:
+$.ajax("http://localhost:3000/users")
+
+# Plain Javascript:
+var xhttp = new XMLHttpRequest();
+xhttp.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+    console.log(this.responseText);
+  }
+};
+xhttp.open("GET", "ajax_info.txt", true);
+xhttp.send();
 ```
 
-Another issue is limiting the usage of our API (throttling), protecting it from nasty things like [DoS Attack](https://en.wikipedia.org/wiki/Denial-of-service_attack), and logging data. For this we're gonna use a handy gem [rack-attack](https://github.com/kickstarter/rack-attack) brought to you by the nice people at [KICKSTARTER](https://www.kickstarter.com/)
+Another issue is limiting the usage of our API (throttling), protecting it from nasty things like [DoS Attack](https://en.wikipedia.org/wiki/Denial-of-service_attack), and logging data. For this we're gonna use a handy gem [rack-attack](https://github.com/kickstarter/rack-attack) brought to you by the nice people at [Kickstarter](https://www.kickstarter.com/)
 
 ```
 gem 'rack-attack'
@@ -80,7 +91,7 @@ Edit `application.rb` to include the Rack::Attack middleware:
 config.middleware.use Rack::Attack
 ```
 
-We're using RackAttack, but now need to initialize it. We can safelist, blocklist, throttle, and track.
+We've got RackAttack in our middleware stack, but now need to initialize it. We can safelist, blocklist, throttle, and track.
 ```
 # config/initializers/rack_attack.rb
 
@@ -116,7 +127,7 @@ The above is a basic setup. We're telling Rack::Attack to green light localhost,
 
 > Try adding a throttling rule, remove localhost from the safelist, then hammer your api with consecutive requests and see the result.
 
-So far so good.
+So far so good, but now I'd really like to have this app hosted somewhere so it's not just running on my local machine.
 
 rails g model user name email
 rails g serializer user
