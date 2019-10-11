@@ -13,7 +13,7 @@ rake db:create
 
 Add RSpec for testing and FactoryBot:
 
-Gemfile inside :test, :development group:
+Add to `Gemfile` inside :test, :development group:
 ```
 gem 'rspec-rails'
 gem 'factory_bot_rails'
@@ -35,33 +35,88 @@ rails g rspec:install # Install RSpec
 Tell our serializer to use [json:api](https://jsonapi.org/) standard for json responses. Click on the link to read more about it.
 
 ```
-touch config/initializers/active_model_serializers.rb
 'ActiveModelSerializers.config.adapter = ActiveModelSerializers::Adapter::JsonApi' >> config/initializers/active_model_serializers.rb
 ```
 
-# CORS
+At this point you may want to scaffold a `User` with `name email` and run `rails s` to do a quick test. Send a few requests and test it.
+> You may find some browsers block CORS requests *even on localhost*
+
+Our API wouldn't be very useful if other websites can't make CORS requests to it. You can read more about CORS [here](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS), but for now let's add some middleware to allow CORS requests.
+
+Add CORS support:
+```
 gem 'rack-cors'
-# https://github.com/cyu/rack-cors
 bundle install
-# Edit config/application.rb allow (origin, resource, method)
+```
+
+Read more about rack-cors gem at [https://github.com/cyu/rack-cors](https://github.com/cyu/rack-cors)
+
+The CORS middleware will intercept requests and *allow* certain *request types* from certain *origins* to certain *resources*. We're gonna allow everything for now with the following code inside `application.rb`:
+
+```
 config.middleware.insert_before 0, Rack::Cors do
   allow do
     origins '*'
     resource '*', headers: :any, methods: [:get, :post, :options]
   end
 end
-# Test CORS on localhost using chrome
-# $.ajax("http://localhost:3000/api/v1/users")
+```
 
-# Rate Limiting / Throttling
+If your CORS Ajax requests were blocked before, try them now. In any website with jQuery, open up the developer console and try to send a quick request to your API:
+```
+# $.ajax("http://localhost:3000/users")
+```
+
+Another issue is limiting the usage of our API (throttling), protecting it from nasty things like [DoS Attack](https://en.wikipedia.org/wiki/Denial-of-service_attack), and logging data. For this we're gonna use a handy gem [rack-attack](https://github.com/kickstarter/rack-attack) brought to you by the nice people at [KICKSTARTER](https://www.kickstarter.com/)
+
+```
 gem 'rack-attack'
-# https://github.com/kickstarter/rack-attack
 bundle install
-# Edit config/application.rb to add Rack Attack middleware
+```
+
+Edit `application.rb` to include the Rack::Attack middleware:
+
+```
 config.middleware.use Rack::Attack
-touch config/initializers/rack_attack.rb
-# Add rules for whitelisting localhost, throttling to limit # of requests per x seconds, and logging requests
-# Try adding a throttling rule and then test requests to break it and see the result
+```
+
+We're using RackAttack, but now need to initialize it. We can safelist, blocklist, throttle, and track.
+```
+# config/initializers/rack_attack.rb
+
+class Rack::Attack
+
+  # `Rack::Attack` is configured to use the `Rails.cache` value by default,
+  # but you can override that by setting the `Rack::Attack.cache.store` value
+  Rack::Attack.cache.store = ActiveSupport::Cache::MemoryStore.new
+
+  # Allow all local traffic
+  safelist('allow-localhost') do |req|
+    '127.0.0.1' == req.ip || '::1' == req.ip
+  end
+
+  # Allow an IP address to make 5 requests every 5 seconds
+  throttle('req/ip', limit: 5, period: 5) do |req|
+    req.ip
+  end
+
+  # Send the following response to throttled clients
+  self.throttled_response = ->(env) {
+    retry_after = (env['rack.attack.match_data'] || {})[:period]
+    [
+      429,
+      {'Content-Type' => 'application/json', 'Retry-After' => retry_after.to_s},
+      [{error: "Throttle limit reached. Retry later."}.to_json]
+    ]
+  }
+end
+```
+
+The above is a basic setup. We're telling Rack::Attack to green light localhost, limit everyone to 5 requests per 5 seconds, and send back a custom message with 429 response if someone exceeds that.
+
+> Try adding a throttling rule, remove localhost from the safelist, then hammer your api with consecutive requests and see the result.
+
+So far so good.
 
 rails g model user name email
 rails g serializer user
@@ -71,7 +126,7 @@ rails g scaffold_controller api::v1::users --model-name=user
 # User cUrl to make requests
 curl -X GET -H "Accept: application/json" "localhost:3000/api/v1/users"
 curl -X POST -H "Accept: application/json" -H "Content-Type: application/json" -d '{"user": {"name": "Mario", "email": "mario@gmail.com"}}' "localhost:3000/api/v1/users"
-curl -X PUT ation/json" -H "Content-Type: application/json" -d '{"email": "mario.saraiva@gmail.com"}' "localhost:3000/api/v1/users/2"
+curl -X PUT ation/json" -H "Content-Type: application/json" -d '{"email": "mariosar@gmail.com"}' "localhost:3000/api/v1/users/2"
 curl -X DELETE "localhost:3000/api/v1/users/1"
 
 ### Deployment to HEROKU
