@@ -128,3 +128,10 @@ rake db:migrate
 # Run heroku local and you will start your web server by executing the command in your Procfile
 
 
+# Useful Heroku Links:
+# https://devcenter.heroku.com/articles/getting-started-with-rails5
+# https://devcenter.heroku.com/articles/procfile
+# https://devcenter.heroku.com/articles/deploying-rails-applications-with-the-puma-web-server
+# https://devcenter.heroku.com/articles/config-vars
+# https://devcenter.heroku.com/articles/connecting-to-heroku-postgres-databases-from-outside-of-heroku
+
