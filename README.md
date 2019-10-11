@@ -1,46 +1,43 @@
-# README
+# API EXAMPLE
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a Rails API tutorial example code.
 
-Things you may want to cover:
+## Steps to reproduce this repository
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
+Creating the project:
+```
 rails new api_test --api
 bundle install
 rake db:create
+```
 
-Add to Gemfile
-# inside test / development
+Add RSpec for testing and FactoryBot:
+
+Gemfile inside :test, :development group:
+```
 gem 'rspec-rails'
-gem 'factory_girl_rails'
-# all
+gem 'factory_bot_rails'
+```
+
+Since this is an API and we're serving JSON responses include:
+```
 gem 'active_model_serializers'
+```
+
+Run:
+```
 bundle install
+rails g rspec:install # Install RSpec
+```
 
-rails g rspec:install
+'active_model_serializers' is great for defining *what* model attributes and relationships we'd like to respond with + accepts custom methods!
 
-# Tell our serializer to use json:api standard
-# https://jsonapi.org/
+Tell our serializer to use [json:api](https://jsonapi.org/) standard for json responses. Click on the link to read more about it.
+
+```
 touch config/initializers/active_model_serializers.rb
-ActiveModelSerializers.config.adapter = ActiveModelSerializers::Adapter::JsonApi
+'ActiveModelSerializers.config.adapter = ActiveModelSerializers::Adapter::JsonApi' >> config/initializers/active_model_serializers.rb
+```
 
 # CORS
 gem 'rack-cors'
