@@ -1,4 +1,4 @@
-# Rails REST API EXAMPLE
+# Rails REST API example
 
 This is a Rails API tutorial example code. The tutorial can be found on my [blog](https://mariosaraiva.com/blog)
 
